@@ -1,13 +1,23 @@
-import { PrismaClient } from "@prisma/client/extension";
+import { PrismaClient } from '@prisma/client/extension';
+import { PrismaNeon } from '@prisma/adapter-neon';
 
-const globalForPrisma = global as unknown as {
-  prisma: PrismaClient;
-};
+const globalForPrisma = global as unknown as { prisma?: PrismaClient };
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: ["query"],
+function createPrisma() {
+  const adapter = new PrismaNeon({
+    connectionString: process.env.DATABASE_URL ?? '', // deve estar definida
   });
+  return new PrismaClient({ adapter });
+}
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+export function getPrisma() {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = createPrisma();
+  }
+  return globalForPrisma.prisma;
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  // cache para hot‑reload no dev
+  globalForPrisma.prisma ??= createPrisma();
+}

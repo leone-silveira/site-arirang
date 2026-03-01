@@ -13,13 +13,14 @@ export default function Contato() {
   async function handleSubmit(e: any) {
     e.preventDefault();
 
-    await fetch("/api/contact", {
-      method: "POST",
-      body: JSON.stringify(form),
-    });
+    await fetch('/api/contato', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify(form),
+     });
 
-    alert("Mensagem enviada!");
-  }
+     alert('Mensagem enviada!');
+   }
 
   return (
     <div className="p-10 max-w-xl mx-auto">
