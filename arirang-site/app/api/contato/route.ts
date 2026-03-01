@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const prisma = getPrisma();           // só aqui é que o client é criado
+  const prisma = getPrisma();
 
   await prisma.contact.create({ data: body });
 
