@@ -5,10 +5,30 @@ import { getPrisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const prisma = getPrisma();
+  try {
+    const body = await req.json();
 
-  await prisma.contact.create({ data: body });
+    // basic validation - ensure required fields exist
+    if (!body.name || !body.email || !body.message) {
+      return NextResponse.json(
+        { ok: false, error: 'missing name, email or message' },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json({ ok: true });
+    const prisma = getPrisma();
+
+    await prisma.contact.create({ data: body });
+
+    return NextResponse.json({ ok: true });
+  } catch (err: any) {
+    // log the original error so it shows up in Vercel/terminal logs
+    console.error('POST /api/contato error:', err);
+
+    // return a generic message to the client
+    return NextResponse.json(
+      { ok: false, error: err?.message ?? 'unknown' },
+      { status: 500 }
+    );
+  }
 }
