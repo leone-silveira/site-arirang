@@ -12,7 +12,7 @@ export default function Contato() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function handleSubmit(e: any) {
     e.preventDefault();
-
+    console.log('Submitting form:', form);
     await fetch('/api/contato', {
        method: 'POST',
        headers: { 'Content-Type': 'application/json' },
@@ -25,7 +25,7 @@ export default function Contato() {
   return (
     <div className="p-10 max-w-xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">
-        Contato
+        Contato do leone
       </h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
