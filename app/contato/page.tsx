@@ -12,7 +12,7 @@ export default function Contato() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function handleSubmit(e: any) {
     e.preventDefault();
-
+    console.log('Submitting form:', form);
     await fetch('/api/contato', {
        method: 'POST',
        headers: { 'Content-Type': 'application/json' },
