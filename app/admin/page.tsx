@@ -5,7 +5,7 @@ import { getPrisma } from '@/lib/prisma';
 export const revalidate = 0; // always server-side
 
 export default async function AdminPage() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const isAdmin = cookieStore.get('admin')?.value === 'true';
   if (!isAdmin) {
     // redirect to login form
@@ -15,7 +15,7 @@ export default async function AdminPage() {
   const prisma = getPrisma();
   const students = await prisma.student.findMany({
     include: { user: true },
-    orderBy: { createdAt: 'asc' },
+    orderBy: { userId: 'asc' },
   });
 
   return (
