@@ -25,7 +25,7 @@ export default function Contato() {
   return (
     <div className="p-10 max-w-xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">
-        Contato do leone
+        Contato
       </h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
