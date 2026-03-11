@@ -43,7 +43,7 @@ export default async function InformativosPage() {
                   <p className="text-xs text-gray-500">
                     {new Date(news.createdAt).toLocaleDateString('pt-BR')} ·{' '}
                     {news.course ? `${news.course.name}` : 'Geral'}
-                    {news.teacher ? ` · ${news.teacher.user.name}` : ''}
+                    {news.teacher ? ` · ${news.teacher.userId}` : ''}
                   </p>
                 </div>
               </header>
