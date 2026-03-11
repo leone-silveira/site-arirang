@@ -23,19 +23,120 @@ model User {
   createdAt DateTime @default(now())
 
   student   Student?
+  teacher   Teacher?
 }
 
 model Student {
+  id         String      @id @default(cuid())
+  userId     String      @unique
+  serie      String?
+  turno      String?
+  status     String?     @default("active")
+  createdAt  DateTime    @default(now())
+
+  user       User        @relation(fields: [userId], references: [id])
+  enrollments Enrollment[]
+  grades      Grade[]
+  attendances Attendance[]
+  announcements Announcement[]
+}
+
+model Teacher {
   id        String   @id @default(cuid())
   userId    String   @unique
-  serie     String?
-  turno     String?
-  status    String?
+  bio       String?
+  createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  courses   Course[]
+  announcements Announcement[]
+}
+
+model Course {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime     @default(now())
+
+  teacher     Teacher?     @relation(fields: [teacherId], references: [id])
+  teacherId   String?
+
+  enrollments Enrollment[]
+  grades      Grade[]
+  attendances Attendance[]
+  announcements Announcement[]
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId String
+  course    Course   @relation(fields: [courseId], references: [id])
+  courseId  String
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, courseId])
+}
+
+model Grade {
+  id          String   @id @default(cuid())
+  student     Student  @relation(fields: [studentId], references: [id])
+  studentId   String
+  course      Course   @relation(fields: [courseId], references: [id])
+  courseId    String
+  title       String   // Ex: "Prova 1", "Trabalho"
+  score       Float
+  maxScore    Float    @default(10)
+  weight      Float    @default(1)
+  createdAt   DateTime @default(now())
+
+  @@index([studentId])
+  @@index([courseId])
+}
+
+model Attendance {
+  id          String   @id @default(cuid())
+  student     Student  @relation(fields: [studentId], references: [id])
+  studentId   String
+  course      Course   @relation(fields: [courseId], references: [id])
+  courseId    String
+  date        DateTime
+  present     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([studentId])
+  @@index([courseId])
+  @@unique([studentId, courseId, date])
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  createdAt   DateTime @default(now())
+
+  course      Course?  @relation(fields: [courseId], references: [id])
+  courseId    String?
+
+  student     Student? @relation(fields: [studentId], references: [id])
+  studentId   String?
+
+  teacher     Teacher? @relation(fields: [teacherId], references: [id])
+  teacherId   String?
+}
+
+model GalleryImage {
+  id        String   @id @default(cuid())
+  title     String
+  caption   String?
+  data      Bytes
+  mimeType  String   @default("image/jpeg")
+  createdAt DateTime @default(now())
 }
 
 enum Role {
   ADMIN
   STUDENT
+  TEACHER
 }
