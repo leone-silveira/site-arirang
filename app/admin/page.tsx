@@ -1,40 +1,85 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { getPrisma } from '@/lib/prisma';
 
 export const revalidate = 0; // always server-side
 
 export default async function AdminPage() {
-  const cookieStore = await cookies();
-  const isAdmin = cookieStore.get('admin')?.value === 'true';
-  if (!isAdmin) {
-    // redirect to login form
-    redirect('/admin/login');
-  }
-
   const prisma = getPrisma();
-  const students = await prisma.student.findMany({
-    include: { user: true },
-    orderBy: { userId: 'asc' },
-  });
+
+  const [studentCount, courseCount, announcementCount, imageCount] = await Promise.all([
+    prisma.student.count(),
+    prisma.course.count(),
+    prisma.announcement.count(),
+    prisma.galleryImage.count(),
+  ]);
 
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-      <p>List of students:</p>
-      <ul className="list-disc pl-5">
-        {students.map((s) => (
-          <li key={s.id}>{s.user.name} ({s.user.email})</li>
-        ))}
-      </ul>
-      <form action="/api/admin/logout" method="post" className="mt-6">
-        <button
-          type="submit"
-          className="px-4 py-2 bg-red-500 text-white rounded"
+    <main>
+      <h1 className="text-3xl font-bold text-red-700 mb-4">Painel do Admin</h1>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Link href="/admin/alunos" className="p-6 bg-white rounded shadow hover:shadow-lg">
+          <p className="text-sm text-gray-500">Alunos cadastrados</p>
+          <p className="text-3xl font-bold text-red-600">{studentCount}</p>
+        </Link>
+
+        <Link href="/admin/cursos" className="p-6 bg-white rounded shadow hover:shadow-lg">
+          <p className="text-sm text-gray-500">Cursos</p>
+          <p className="text-3xl font-bold text-red-600">{courseCount}</p>
+        </Link>
+
+        <Link href="/admin/informativos" className="p-6 bg-white rounded shadow hover:shadow-lg">
+          <p className="text-sm text-gray-500">Informativos</p>
+          <p className="text-3xl font-bold text-red-600">{announcementCount}</p>
+        </Link>
+
+        <Link href="/admin/galeria" className="p-6 bg-white rounded shadow hover:shadow-lg">
+          <p className="text-sm text-gray-500">Imagens na galeria</p>
+          <p className="text-3xl font-bold text-red-600">{imageCount}</p>
+        </Link>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <Link
+          href="/admin/notas"
+          className="p-6 bg-white rounded shadow hover:shadow-lg"
         >
-          Logout
-        </button>
-      </form>
+          <h2 className="text-lg font-semibold mb-2">Lançar notas</h2>
+          <p className="text-sm text-gray-600">
+            Adicione ou edite notas dos alunos por curso e avaliação.
+          </p>
+        </Link>
+
+        <Link
+          href="/admin/presenca"
+          className="p-6 bg-white rounded shadow hover:shadow-lg"
+        >
+          <h2 className="text-lg font-semibold mb-2">Lançar presença</h2>
+          <p className="text-sm text-gray-600">
+            Marque presença em uma data para os alunos.
+          </p>
+        </Link>
+
+        <Link
+          href="/admin/informativos"
+          className="p-6 bg-white rounded shadow hover:shadow-lg"
+        >
+          <h2 className="text-lg font-semibold mb-2">Criar informativos</h2>
+          <p className="text-sm text-gray-600">
+            Envie avisos para uma turma ou aluno específico.
+          </p>
+        </Link>
+
+        <Link
+          href="/admin/galeria"
+          className="p-6 bg-white rounded shadow hover:shadow-lg"
+        >
+          <h2 className="text-lg font-semibold mb-2">Adicionar imagens</h2>
+          <p className="text-sm text-gray-600">
+            Faça upload de imagens para a galeria do site.
+          </p>
+        </Link>
+      </div>
     </main>
   );
 }
